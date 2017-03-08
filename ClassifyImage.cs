@@ -8,7 +8,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 
 namespace MarsImageThing
 {
