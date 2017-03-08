@@ -7,6 +7,9 @@ This code uses the [MonoGame XNA Framework](http://www.monogame.net/).
 All code for the UI can be found in: MarsImageThing/Game1.cs
 The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
+#Usage
+The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
+The images must be in .jpg format and the example images can be found in: MarsImageThing/Content/
 
 #Info
 Last edit: 3/8/2017
