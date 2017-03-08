@@ -10,5 +10,7 @@ The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
 #Info
 Last edit: 3/8/2017
+
 Made By: Zack Jorquera
+
 All right reserved
