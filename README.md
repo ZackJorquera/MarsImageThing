@@ -4,3 +4,5 @@ This program takes in 2-6 black and white images of size 256X256. the program wi
 
 #Code
 This code uses the [MonoGame XNA Framework](http://www.monogame.net/).
+All code for the UI can be found in: MarsImageThing/Game1.cs
+The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
