@@ -90,14 +90,13 @@ namespace MarsImageThing
                                 outputImage.SetPixel(x, y, colors[pointClosest]);
                             }
                         }
-                        
-                            outputImage.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                            return stream;
-                        
+                        outputImage.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                        return stream;
                     }
                 }
                 catch(Exception ex)
                 {
+                    Console.WriteLine("Error: " + ex.Message);
                 }
             }
         return null;
