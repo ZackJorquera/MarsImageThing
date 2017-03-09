@@ -1,5 +1,5 @@
-# MarsImageClassifyer about
-This program was made for the martion club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
+# MarsImageClassifyer
+This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
 # Code
 This code uses the [MonoGame XNA Framework](http://www.monogame.net/) with visual studios.
@@ -8,7 +8,7 @@ The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
 ## How the code works to classify the images
 ### Intro
-in everyday life, everything absorbs and reflects light, this in turn gives it its color. while we humans can only see the visable spectrum (400nm - 750nm) there are still more wavelengths that are also effected be objects in the same way.
+In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. while we humans can only see the visible spectrum (400nm - 750nm) there are still more wavelengths that are also affected by objects in the same way.
 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
@@ -47,7 +47,7 @@ for(int i = 0; i < ImageLocations.Length; i++)
 Along side this not much else is really needed  exept for the colors list.
 
 ### Part 3: Comparing images
-This is done by taking the dot puduct of two vecotrs The dot product can be expressed by the equation ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647 "Look it up") where a and b are both vectors of n dementions. In the promram will will salve for Cos(θ).
+This is done by taking the dot product of two vectors, this can be expressed by: ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647 "Look it up") where a and b are both vectors of n dimensions. In this promram, we will solve for Cos(θ).
 ```c#
 for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
 {
@@ -75,13 +75,15 @@ for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
 }
 ```
 #### Variation 1
-vector a can be set to be at the brightness of each pixle which is repusented as the R, B or G value. This is done for bith a and b where a is the current pixle and b is the the pixel at the clicked point. (image coming soon)
+Vector values can be set to that same value as the brightness of each pixel, represented by the R, B or G values. This is done for both a and b where a is the current pixel and b is the location of the clicked point. 
+(image coming soon)
+
 #### Variation 2
-vector a is set in the same way as in Variation 1, but vector b is set using spectral data (this is where spectroscapy comes in). To do this a Reflection vs. wavelength graph must be used. so F(x) returns the % reflection where x is the wavelength, and knowing the wavelenght of each filter for each camera and get the a vector to compair to.
+vector a is set in the same way as in Variation 1, but vector b is set using spectral data (this is where spectroscopy comes in). To do this a Reflection vs. wavelength graph must be used. so F(x) returns the % reflection where x is the wavelength, and knowing the wavelength of each filter for each camera and get the a vector to compare to.
 (Image coming soon)
 
 ### Part 4: Classification
-This is where it iterate over each pixel of the classiﬁedImage and select the maximum value for the Cos(θ) respective to that pixel and that of vector b's pixel.
+This is where it iterates over each pixel of the classiﬁedImage and selects the maximum value for the Cos(θ) respective to that pixel and that of vector b.
 ```c#
 for (int x = 0; x < 256; x++)
 {
