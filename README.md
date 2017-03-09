@@ -44,7 +44,10 @@ for(int i = 0; i < ImageLocations.Length; i++)
     }
 }
 ```
-Along side this not much else is really needed  exept for the colors list.
+The colors list I used to fix all six points:
+```c#
+System.Drawing.Color[] colors = { System.Drawing.Color.FromName("Red"), System.Drawing.Color.FromName("Blue"), System.Drawing.Color.FromName("Green"), System.Drawing.Color.FromName("Orange"), System.Drawing.Color.FromName("Gold"), System.Drawing.Color.FromName("Purple") };
+```
 
 ### Part 3: Comparing images
 This is done by taking the dot product of two vectors, this can be expressed by: ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647 "Look it up") where a and b are both vectors of n dimensions. In this promram, we will solve for Cos(θ).
