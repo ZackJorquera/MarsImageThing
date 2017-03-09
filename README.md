@@ -2,7 +2,7 @@
 This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
 # Code
-This code uses the [MonoGame XNA Framework](http://www.monogame.net/) with visual studios.
+This code uses the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios.
 All code for the UI can be found in: MarsImageThing/Game1.cs
 The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
@@ -50,7 +50,7 @@ System.Drawing.Color[] colors = { System.Drawing.Color.FromName("Red"), System.D
 ```
 
 ### Part 3: Comparing Images
-This is done by taking the dot product of two vectors, this can be expressed by: ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647 "Look it up") Where a and b are both vectors of n dimensions. In this promram, we solve for Cos(θ).
+This is done by taking the dot product of two vectors, this can be expressed by: ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647 "Look it up") Where a and b are both vectors of n dimensions. In this program, we solve for Cos(θ).
 ```c#
 for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
 {
@@ -78,11 +78,11 @@ for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
 }
 ```
 #### Variation 1
-Vector values can be set to that same value as the brightness of each pixel, represented by the R, B or G values. This is done for both a and b, where a is the current pixel and b is the location of the clicked point. 
+Vector values can be set to that same value as the brightness of each pixel, represented by the Red, Green or Blue values (I used the Blue value). This is done for both vector a and b, where vector a is the current pixel and vector b is the location of the clicked point. 
 ![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/type%201%20classification.gif)
 
 #### Variation 2
-vector a is set in the same way as in Variation 1, but vector b is set using spectral data (this is where spectroscopy comes in). To do this a Reflection vs. wavelength graph must be used. so F(x) returns the % reflection where x is the wavelength, and knowing the wavelength of each filter for each camera and get the a vector to compare to.
+Vector a is set in the same way as in Variation 1, while vector b is set using spectral data from a list of data points. To do this a Reflection vs. wavelength graph must be used as F(x), it should return the % reflection when x is equal to the wavelength. This can be done using the known wavelength of each filter on each camera.
 ![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/detailsub.png)
 
 ### Part 4: Classification
