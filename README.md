@@ -48,7 +48,7 @@ for(int i = 0; i < ImageLocations.Length; i++)
 Along side this not much else is really needed  exept for the colors list.
 
 ### Part 3: Comparing images
-This is done by taking the dot puduct of two vecotrs The dot product can be expressed by the equation ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647, "Look it up")
+This is done by taking the dot puduct of two vecotrs The dot product can be expressed by the equation ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647 "Look it up")
 
 # Usage
 The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
