@@ -1,4 +1,4 @@
-# MarsImageClassifyer
+# MarsImageClassifier
 This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
 # Code
