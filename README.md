@@ -79,11 +79,11 @@ for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
 ```
 #### Variation 1
 Vector values can be set to that same value as the brightness of each pixel, represented by the R, B or G values. This is done for both a and b, where a is the current pixel and b is the location of the clicked point. 
-(image coming soon)
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/type%201%20classification.gif , "That's is how its done!!")
 
 #### Variation 2
 vector a is set in the same way as in Variation 1, but vector b is set using spectral data (this is where spectroscopy comes in). To do this a Reflection vs. wavelength graph must be used. so F(x) returns the % reflection where x is the wavelength, and knowing the wavelength of each filter for each camera and get the a vector to compare to.
-(Image coming soon)
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/type%201%20classification.gif)
 
 ### Part 4: Classification
 This is where it iterates over each pixel of the classiﬁedImage and selects the maximum value for the Cos(θ) respective to that pixel and that of vector b.
