@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace MarsImageThing
     class ClassifyImage
     {
 
-        public Stream Classify(string[] ImageLocations, List<Microsoft.Xna.Framework.Point> points, bool selfClassification)
+        public Stream Classify(string[] ImageLocations, List<SpectralData> spectralDataPoints)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Image File (*.png)|*.png|All files (*.*)|*.*";
@@ -30,7 +30,7 @@ namespace MarsImageThing
                     {
                         Bitmap outputImage = new Bitmap(256,256);
                         System.Drawing.Color[] colors = { System.Drawing.Color.FromName("Red"), System.Drawing.Color.FromName("Blue"), System.Drawing.Color.FromName("Green"), System.Drawing.Color.FromName("Orange"), System.Drawing.Color.FromName("Gold"), System.Drawing.Color.FromName("Purple") };
-                        List<Bitmap> imageList = new List<Bitmap>();
+                        Bitmap[] imageList = new Bitmap[6];
 
                         for(int i = 0; i < ImageLocations.Length; i++)
                         {
@@ -38,31 +38,33 @@ namespace MarsImageThing
                             {
                                 Bitmap tempImage = new Bitmap(ImageLocations[i]);
                                 if (tempImage.Size.Height == tempImage.Size.Width && tempImage.Size.Width == 256)
-                                    imageList.Add(tempImage);
+                                    imageList[i] = tempImage;
                             }
                         }
 
-                        double[, ,] classifyedImage = new double[256, 256, points.Count];
+                        double[, ,] classifyedImage = new double[256, 256, spectralDataPoints.Count];
 
-                        for (int i = 0; i < points.Count; i++)
+                        for (int i = 0; i < spectralDataPoints.Count; i++)
                         {
                             for (int x = 0; x < 256; x++)
                             {
                                 for (int y = 0; y < 256; y++)
                                 {
-                                    int sum = 0;
+                                    double sum = 0;
                                     double aMag = 0;
                                     double bMag = 0;
-                                    for(int j = 0; j < imageList.Count; j++)
+                                    for(int j = 0; j < imageList.Length; j++)//dot product
                                     {
+                                        if (imageList[j] == null)
+                                            continue;
                                         aMag += Math.Pow(Convert.ToInt16(imageList[j].GetPixel(x, y).B.ToString(), 10), 2);
-                                        bMag += Math.Pow(Convert.ToInt16(imageList[j].GetPixel(points[i].X, points[i].Y).B.ToString(), 10),2);
-                                        sum += Convert.ToInt16(imageList[j].GetPixel(x, y).B.ToString(), 10) * Convert.ToInt16(imageList[j].GetPixel(points[i].X, points[i].Y).B.ToString(), 10);
+                                        bMag += Math.Pow((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? Convert.ToInt16(imageList[j].GetPixel(spectralDataPoints[i].point.X, spectralDataPoints[i].point.Y).B.ToString(), 10) : spectralDataPoints[i].vector[j] * 255, 2);
+                                        sum += Convert.ToInt16(imageList[j].GetPixel(x, y).B.ToString(), 10) * ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? Convert.ToInt16(imageList[j].GetPixel(spectralDataPoints[i].point.X, spectralDataPoints[i].point.Y).B.ToString(), 10) : spectralDataPoints[i].vector[j] * 255);
                                     }
                                     aMag = Math.Sqrt(aMag);
                                     bMag = Math.Sqrt(bMag);
 
-                                    classifyedImage[x, y, i] = ((double)sum) / (aMag * bMag);
+                                    classifyedImage[x, y, i] = (sum) / (aMag * bMag);
                                 }
                             }
                         }
@@ -72,7 +74,7 @@ namespace MarsImageThing
                             for (int y = 0; y < 256; y++)
                             {
                                 int pointClosest = 6;
-                                for(int i = 0; i < points.Count; i++)
+                                for (int i = 0; i < spectralDataPoints.Count; i++)
                                 {
                                     if(pointClosest == 6)
                                     {
