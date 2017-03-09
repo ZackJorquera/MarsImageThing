@@ -7,13 +7,13 @@ This code uses the [MonoGame XNA Framework](http://www.monogame.net/) with visua
 All code for the UI can be found in: MarsImageThing/Game1.cs
 The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
-#2 How the code works to classify the images
-#3 Intro
+## How the code works to classify the images
+### Intro
 in everyday life, everything absorbs and reflects light, this in turn gives it its color. while we humans can only see the visable spectrum (400nm - 750nm) there are still more wavelengths that are also effected be objects in the same way.
 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
-#3 Part 1: Files
+### Part 1: Files
 In windows, opening a file using their built in using System.Windows.Forms.OpenFileDiolog can be done like this (found in Game1.cs):
 ```c#
 OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -32,7 +32,7 @@ if (openFileDialog.ShowDialog() == DialogResult.OK)
 ```
 In this example the file is never used, but the file location is saved to the variable stream when stream = openFileDialog2.OpenFile() was used.
 
-#3 Part 2: Declaring Variables
+### Part 2: Declaring Variables
 Here the file paths are converted in to a System.Drawing.BitMap where each pixel can be accesed sepretly:
 ```c#
 for(int i = 0; i < ImageLocations.Length; i++)
@@ -47,7 +47,7 @@ for(int i = 0; i < ImageLocations.Length; i++)
 ```
 Along side this not much else is really needed  exept for the colors list.
 
-#3 Part 3: Comparing images
+### Part 3: Comparing images
 This is done by taking the dot puduct of two vecotrs The dot product can be expressed by the equation ![alt text](https://wikimedia.org/api/rest_v1/media/math/render/svg/f578afaa0ed0f3728d4a6546d11b95456ec84647, "Look it up")
 
 # Usage
