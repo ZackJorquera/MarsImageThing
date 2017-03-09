@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ namespace MarsImageThing
 
         bool hoveringOverNewPointButton = false;
         bool hoveringOverRemovePointButton = false;
-        List<Point> points = new List<Point>();
+        List<SpectralData> spectralDataPoints = new List<SpectralData>();
         Color[] colors = { Color.Red, Color.Blue, Color.Green, Color.Orange, Color.Gold, Color.Purple };
         int colorOn = 0;
         bool findingPoint = false;
@@ -48,6 +48,8 @@ namespace MarsImageThing
 
         string OutputText = "";
         int ErrorTimeOut = 0;
+
+        
 
 
         string x;
@@ -118,7 +120,7 @@ namespace MarsImageThing
 
             if (Classifying)
             {
-                Stream stream = ClassifyImage.Classify(ImagesToEdit, points, false);
+                Stream stream = ClassifyImage.Classify(ImagesToEdit, spectralDataPoints);
                 if (stream != null)
                     classifyedImage = Texture2D.FromStream(GraphicsDevice, stream);
                 Classifying = false;
@@ -182,7 +184,7 @@ namespace MarsImageThing
                             if (findingPoint)
                                 findingPoint = false;
                             else
-                                points.Remove(points[points.Count - 1]);
+                                spectralDataPoints.Remove(spectralDataPoints[spectralDataPoints.Count - 1]);
                         }
                     }
                     else
@@ -209,7 +211,7 @@ namespace MarsImageThing
                                         imagesInList[i] = null;
                                         ImagesToEdit[i] = null;;
                                     }
-                                    points = new List<Point>();
+                                    spectralDataPoints = new List<SpectralData>();
                                     classifyedImage = null;
                                     colorOn = 0;
                                     findingPoint = false;
@@ -227,7 +229,7 @@ namespace MarsImageThing
             {
                 if (imagesInList[0] != null)
                 {
-                    if (points.Count > 1)
+                    if (spectralDataPoints.Count > 1)
                     {
                         if (!Classifying)
                             OutputText = "Click on the 'Classify' button to made a new classified image.";
@@ -253,8 +255,32 @@ namespace MarsImageThing
 
                 if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && finding.X > 0 && finding.X <= 255 && finding.Y > 0 && finding.Y <= 255)
                 {
-                    points.Add(finding);
+                    spectralDataPoints.Add(new SpectralData(finding, null));
                     findingPoint = false;
+                }
+                else if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && mouseState.X > 40 + (colorOn - 1) * (855 / 6) && mouseState.X <= 40 + (colorOn - 1) * (855 / 6) + 50 && mouseState.Y > 350 && mouseState.Y <= 400)//(40 + i * (855/6), 350, 50,50)
+                {
+                    OpenFileDialog openFileDialog2 = new OpenFileDialog();
+                    openFileDialog2.Filter = "Ascii (*.asc)|*.asc|All files (*.*)|*.*";//change
+                    openFileDialog2.FilterIndex = 1;
+                    openFileDialog2.RestoreDirectory = true;
+
+                    try
+                    {
+                        Stream stream;
+                        if (openFileDialog2.ShowDialog() == DialogResult.OK)
+                        {
+                            if ((stream = openFileDialog2.OpenFile()) != null)
+                            {
+                                spectralDataPoints.Add(new SpectralData(Microsoft.Xna.Framework.Point.Zero, stream));
+                                findingPoint = false;
+                            }
+                        }
+                    }
+                    catch(IOException ex)
+                    {
+
+                    }
                 }
             }
             else
@@ -377,7 +403,7 @@ namespace MarsImageThing
 
                     spriteBatch.DrawString(font, "Remove Point", new Vector2(429, 219), Color.Black);
                 }
-                if (points.Count > 1)
+                if (spectralDataPoints.Count > 1)
                 {
                     if (!hoveringOverClassifyButton)
                         spriteBatch.Draw(whiteBox, new Rectangle(304, 259, 100, 25), Color.LightGray);
@@ -417,15 +443,15 @@ namespace MarsImageThing
                 if(hoveringOver != 0)
                     spriteBatch.Draw((imagesInList[(((hoveringOver == 0) ? 1 : hoveringOver) - 1)] == null) ? BlankImage : imagesInList[(((hoveringOver == 0) ? 1 : hoveringOver) - 1)], new Microsoft.Xna.Framework.Rectangle(25 + (((hoveringOver == 0) ? 1 : hoveringOver) - 1) * openStackValuePer - 10, 25 -10, 256+20, 256+20), Microsoft.Xna.Framework.Color.White);
 
-                for (int i = 0; i < points.Count + ((findingPoint)? 1: 0) && i < colorOn; i++ )
+                for (int i = 0; i < spectralDataPoints.Count + ((findingPoint) ? 1 : 0) && i < colorOn; i++)
                 {
                     
                     spriteBatch.Draw(whiteBox, new Rectangle(40 + i * (855/6), 350, 50,50), ((!BackgroundBlack)? Color.LightGray: Color.DarkGray));
                     spriteBatch.Draw(whiteBox, new Rectangle(45 + i * (855 / 6), 355, 40, 40), colors[i]);
-                    spriteBatch.DrawString(font, "x=" + ((colorOn - 1 == i && findingPoint) ? finding.X.ToString() : points[i].X.ToString()), new Vector2(40 + i * (855 / 6), 410), Color.Black);
-                    spriteBatch.DrawString(font, "y=" + ((colorOn - 1 == i && findingPoint) ? finding.Y.ToString() : points[i].Y.ToString()), new Vector2(40 + i * (855 / 6), 425), Color.Black);
-                    if(points.Count > i && points[i] != null && hoveringOver == 0)
-                        spriteBatch.Draw(whiteDot, new Rectangle(points[i].X + 25 - 5, -points[i].Y + 25 + 256 - 5, 10,10), colors[i]); //-(mouseState.Y - 25 - 256);
+                    spriteBatch.DrawString(font, "x=" + ((colorOn - 1 == i && findingPoint) ? finding.X.ToString() : ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero)? spectralDataPoints[i].point.X.ToString() : "none")), new Vector2(40 + i * (855 / 6), 410), Color.Black);
+                    spriteBatch.DrawString(font, "y=" + ((colorOn - 1 == i && findingPoint) ? finding.Y.ToString() : ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? spectralDataPoints[i].point.Y.ToString() : "none")), new Vector2(40 + i * (855 / 6), 425), Color.Black);
+                    if (spectralDataPoints.Count > i && spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero && hoveringOver == 0)
+                        spriteBatch.Draw(whiteDot, new Rectangle(spectralDataPoints[i].point.X + 25 - 5, -spectralDataPoints[i].point.Y + 25 + 256 - 5, 10, 10), colors[i]);
                     
                 }
 
