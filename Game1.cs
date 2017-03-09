@@ -237,10 +237,12 @@ namespace MarsImageThing
                             OutputText = "Please wait While the images are classifying.";
                     }
                     else
-                        OutputText = "To add a point on the image to classify with, click on the 'add point'\n" +
-                                     "button and then click on the image where you want the point to be.\n" +
-                                     "To remove or cancle the point click the 'remove point' button. You can\n" +
-                                     "You can add up to 6 points, but there must be at least 2 point.";
+                        OutputText = "To add a point on the image to classify with, click on the 'add point' \n" +
+                                     "button and then click on the image where you want the point to be. \n" + 
+                                     "Or you can click on the color for the point at the bottom part of the page \n" + 
+                                     " to add spectral data in a *.asc file, To remove or cancel the point selection \n" + 
+                                     "click the 'remove point' button. You can add up to 6 points, but there must \n" + 
+                                     "be at least 2 points.";
                 }
                 else
                     OutputText = "Click on the image/file icon to add or change the current image.\n" +
