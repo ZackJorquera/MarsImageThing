@@ -39,7 +39,8 @@ for(int i = 0; i < ImageLocations.Length; i++)
     if (ImageLocations[i] != null)
     {
         Bitmap tempImage = new Bitmap(ImageLocations[i]);
-        if (tempImage.Size.Height == tempImage.Size.Width && tempImage.Size.Width == 256)
+        
+        if (tempImage.Size.Height == firstImageSize.Y && tempImage.Size.Width == firstImageSize.X)
             imageList[i] = tempImage;
     }
 }
@@ -54,9 +55,9 @@ This is done by taking the dot product of two vectors, this can be expressed by:
 ```c#
 for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
 {
-    for (int x = 0; x < 256; x++)
+    for (int x = 0; x < ImageSize.X; x++)
     {
-        for (int y = 0; y < 256; y++)
+        for (int y = 0; y < ImageSize.Y; y++)
         {
             double sum = 0;//could also be an int
             double aMag = 0;
@@ -90,9 +91,9 @@ To get the wavelengths for each filter use this chart:
 ### Part 4: Classification
 This is where it iterates over each pixel of the classiﬁedImage and selects the maximum value for the Cos(θ) respective to that pixel and that of vector b.
 ```c#
-for (int x = 0; x < 256; x++)
+for (int x = 0; x < ImageSize.X; x++)
 {
-    for (int y = 0; y < 256; y++)
+    for (int y = 0; y < ImageSize.Y; y++)
     {
         int pointClosest = 6;
         for (int i = 0; i < Points.Count; i++)
