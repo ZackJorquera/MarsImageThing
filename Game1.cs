@@ -502,7 +502,7 @@ namespace MarsImageThing
                 }
 
 
-                spriteBatch.DrawString(font, "(" + x + "," + y + ")", new Vector2(0, 465), Microsoft.Xna.Framework.Color.Black);
+                //spriteBatch.DrawString(font, "(" + x + "," + y + ")", new Vector2(0, 465), Microsoft.Xna.Framework.Color.Black);
 
             spriteBatch.End();
 
