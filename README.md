@@ -2,13 +2,13 @@
 This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
 # Code
-This code uses the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios.
+This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) for Visual Studios.
 All code for the UI can be found in: MarsImageThing/Game1.cs
 The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
 ## How The Code Works to Classify The Images
 ### Key Concepts
-In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 750nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR are used as filters for the cameras.
+In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 700nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR are used as filters for the cameras0
 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
