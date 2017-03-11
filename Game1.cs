@@ -13,17 +13,19 @@ namespace MarsImageThing
     /// </summary>
     public class Game1 : Game
     {
-        bool MouseCLickedDown = false;
-
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        private SpriteFont font;
+        SpriteFont font;// aerial
 
-        Texture2D whiteBox;
+        Texture2D whiteBox;//just one pixel
 
-        Texture2D[] imagesInList = new Texture2D[6];
-        string[] ImagesToEdit = new string[6];
+        Texture2D[] imagesInList = new Texture2D[8];
+        string[] ImagesToEdit = new string[8];
+        Point ImageSize = Point.Zero;
+
+        int cameraImagesAreFrom = -1;//-1 is left, 0 is both, 1 is right
+        bool grabbingSlider = false; 
         
         Texture2D BlankImage;
         int hoveringOver = 0;
@@ -49,7 +51,7 @@ namespace MarsImageThing
         string OutputText = "";
         int ErrorTimeOut = 0;
 
-        
+        bool MouseCLickedDown = false;
 
 
         string x;
@@ -120,9 +122,17 @@ namespace MarsImageThing
 
             if (Classifying)
             {
-                Stream stream = ClassifyImage.Classify(ImagesToEdit, spectralDataPoints);
-                if (stream != null)
-                    classifyedImage = Texture2D.FromStream(GraphicsDevice, stream);
+                OutPutImageData outPutImagesData = ClassifyImage.Classify(ImagesToEdit, spectralDataPoints, cameraImagesAreFrom, ImageSize);
+                if (outPutImagesData.outPutImageStream != null)
+                    classifyedImage = Texture2D.FromStream(GraphicsDevice, outPutImagesData.outPutImageStream);
+                else
+                {
+                    if (outPutImagesData.IOErrorException != null)
+                    {
+                        OutputText = "File input error: " + outPutImagesData.IOErrorException.Message;
+                        ErrorTimeOut = 1000;
+                    }
+                }
                 Classifying = false;
             }
 
@@ -154,14 +164,19 @@ namespace MarsImageThing
                         hoveringOver = 0;
                 }
 
-                if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && hoveringOver != 0)
+                if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && hoveringOver != 0 && !MouseCLickedDown)
                     loadImages(hoveringOver);
             }
 
             x = mouseState.X.ToString();
             y = mouseState.Y.ToString();
 
-            if (ImagesToEdit[0] != null)
+
+            hoveringOverNewPointButton = false;
+            hoveringOverRemovePointButton = false;
+            hoveringOverClassifyButton = false;
+            hoveringOverClearButton = false;
+            if (DoesImagesInListHaveMoreThan1Images())
             {
                 if (mouseState.X >= 300 && mouseState.X < 400 && mouseState.Y >= 215 && mouseState.Y < 215 + 25)//(300, 215, 100, 25)
                 {
@@ -172,62 +187,66 @@ namespace MarsImageThing
                         findingPoint = true;
                     }
                 }
-                else
+                else if (mouseState.X >= 425 && mouseState.X < 425 + 125 && mouseState.Y >= 215 && mouseState.Y < 215 +25)
                 {
-                    hoveringOverNewPointButton = false;
-                    if (mouseState.X >= 425 && mouseState.X < 425 + 125 && mouseState.Y >= 215 && mouseState.Y < 215 +25)
+                    hoveringOverRemovePointButton = true;
+                    if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && colorOn > 0)
                     {
-                        hoveringOverRemovePointButton = true;
-                        if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && colorOn > 0)
-                        {
-                            colorOn--;
-                            if (findingPoint)
-                                findingPoint = false;
-                            else
-                                spectralDataPoints.Remove(spectralDataPoints[spectralDataPoints.Count - 1]);
-                        }
-                    }
-                    else
-                    {
-                        hoveringOverRemovePointButton = false;
-                        if (mouseState.X >= 300 && mouseState.X < 300 + 100 && mouseState.Y >= 255 && mouseState.Y < 255 + 25)
-                        {
-                            hoveringOverClassifyButton = true;
-                            if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && colorOn > 0)
-                            {
-                                Classifying = true;
-                            }
-                        }
+                        colorOn--;
+                        if (findingPoint)
+                            findingPoint = false;
                         else
-                        {
-                            hoveringOverClassifyButton = false;
-                            if (mouseState.X >= 425 && mouseState.X < 425 + 100 && mouseState.Y >= 255 && mouseState.Y < 255 + 25)
-                            {
-                                hoveringOverClearButton = true;
-                                if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown)
-                                {
-                                    for (int i = 0; i < 6; i++)
-                                    {
-                                        imagesInList[i] = null;
-                                        ImagesToEdit[i] = null;;
-                                    }
-                                    spectralDataPoints = new List<SpectralData>();
-                                    classifyedImage = null;
-                                    colorOn = 0;
-                                    findingPoint = false;
-
-                                }
-                            }
-                            else
-                                hoveringOverClearButton = false;
-                        }
+                            spectralDataPoints.Remove(spectralDataPoints[spectralDataPoints.Count - 1]);
                     }
+                }
+                else if (mouseState.X >= 300 && mouseState.X < 300 + 100 && mouseState.Y >= 255 && mouseState.Y < 255 + 25)
+                {
+                    hoveringOverClassifyButton = true;
+                    if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && colorOn > 0)
+                    {
+                        Classifying = true;
+                    }
+                }
+                else if (mouseState.X >= 425 && mouseState.X < 425 + 100 && mouseState.Y >= 255 && mouseState.Y < 255 + 25)
+                {
+                    hoveringOverClearButton = true;
+                    if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown)
+                    {
+                        for (int i = 0; i < imagesInList.Length; i++)
+                        {
+                            imagesInList[i] = null;
+                            ImagesToEdit[i] = null;;
+                        }
+                        spectralDataPoints = new List<SpectralData>();
+                        classifyedImage = null;
+                        colorOn = 0;
+                        findingPoint = false;
+
+                    }
+                }
+                if (mouseState.X >= 103 && mouseState.X < 228 && mouseState.Y >= 290 && mouseState.Y < 290 + 25 && mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Pressed && !MouseCLickedDown)//(153 + (cameraPos * 50), 290, 25, 25)
+                {
+                    grabbingSlider = true;
                 }
             }
 
+            if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && grabbingSlider == true)
+                grabbingSlider = false;
+
+            if(grabbingSlider)
+            {
+                if (mouseState.Position.X < 103 + 25 + 25/2)
+                    cameraImagesAreFrom = -1;
+                else if (mouseState.Position.X > 103 + 75 + 25/2)
+                    cameraImagesAreFrom = 1;
+                else
+                    cameraImagesAreFrom = 0;
+            }
+
+
             if (ErrorTimeOut-- < 0)
             {
-                if (imagesInList[0] != null)
+                if (DoesImagesInListHaveMoreThan1Images())
                 {
                     if (spectralDataPoints.Count > 1)
                     {
@@ -237,12 +256,12 @@ namespace MarsImageThing
                             OutputText = "Please wait While the images are classifying.";
                     }
                     else
-                        OutputText = "To add a point on the image to classify with, click on the 'add point' \n" +
+                        OutputText = "To add a point on the image to classify with, click on the 'add point'\n" +
                                      "button and then click on the image where you want the point to be. \n" + 
-                                     "Or you can click on the color for the point at the bottom part of the page \n" + 
-                                     " to add spectral data in a *.asc file, To remove or cancel the point selection \n" + 
-                                     "click the 'remove point' button. You can add up to 6 points, but there must \n" + 
-                                     "be at least 2 points.";
+                                     "Or you can click on the color for the point at the bottom part of the page\n" + 
+                                     " to add spectral data in a *.asc file, To remove or cancle the point selection\n" + 
+                                     "click the 'remove point' button. You can add up to 6(8) points, but there must\n" + 
+                                     "be at least 2 point.";
                 }
                 else
                     OutputText = "Click on the image/file icon to add or change the current image.\n" +
@@ -252,18 +271,18 @@ namespace MarsImageThing
             if (findingPoint)
             {
 
-                finding.X = mouseState.X - 25;
-                finding.Y = -(mouseState.Y - 25 - 256);
+                finding.X = (mouseState.X - 25) * ImageSize.X/256;
+                finding.Y = -(mouseState.Y - 25 - 256) * ImageSize.Y/256;
 
-                if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && finding.X > 0 && finding.X <= 255 && finding.Y > 0 && finding.Y <= 255)
+                if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && finding.X > 0 && finding.X <= ImageSize.X - 1 && finding.Y > 0 && finding.Y <= ImageSize.Y - 1)
                 {
-                    spectralDataPoints.Add(new SpectralData(finding, null));
+                    spectralDataPoints.Add(new SpectralData(finding, null, cameraImagesAreFrom));
                     findingPoint = false;
                 }
                 else if (mouseState.LeftButton == Microsoft.Xna.Framework.Input.ButtonState.Released && MouseCLickedDown && mouseState.X > 40 + (colorOn - 1) * (855 / 6) && mouseState.X <= 40 + (colorOn - 1) * (855 / 6) + 50 && mouseState.Y > 350 && mouseState.Y <= 400)//(40 + i * (855/6), 350, 50,50)
                 {
                     OpenFileDialog openFileDialog2 = new OpenFileDialog();
-                    openFileDialog2.Filter = "Ascii (*.asc)|*.asc|All files (*.*)|*.*";//change
+                    openFileDialog2.Filter = "Ascii (*.asc)|*.asc|All files (*.*)|*.*";
                     openFileDialog2.FilterIndex = 1;
                     openFileDialog2.RestoreDirectory = true;
 
@@ -274,14 +293,15 @@ namespace MarsImageThing
                         {
                             if ((stream = openFileDialog2.OpenFile()) != null)
                             {
-                                spectralDataPoints.Add(new SpectralData(Microsoft.Xna.Framework.Point.Zero, stream));
+                                spectralDataPoints.Add(new SpectralData(Microsoft.Xna.Framework.Point.Zero, stream, cameraImagesAreFrom));
                                 findingPoint = false;
                             }
                         }
                     }
                     catch(IOException ex)
                     {
-
+                        OutputText = "File input error: " + ex.Message;
+                        ErrorTimeOut = 1000;
                     }
                 }
             }
@@ -331,7 +351,7 @@ namespace MarsImageThing
                     if (fileName[fileName.Length - 5] <= 57 && fileName[fileName.Length - 5] >= 48)
                     {
                         int startFileNumber = fileName[fileName.Length - 5] - 48;
-                        for (int i = 0; i < 6 - hovering + 1 && i < 6 - startFileNumber + 1; i++)
+                        for (int i = 0; i < imagesInList.Length - hovering + 1 && i < imagesInList.Length - startFileNumber + 1; i++)
                         {
                             fileName[fileName.Length - 5] = (char)(i + startFileNumber + 48);
                             var fname = new string(fileName);
@@ -353,12 +373,28 @@ namespace MarsImageThing
 
                     }
                 }
+                if(ImageSize == Point.Zero && imagesInList[hovering -1]!= null)
+                {
+                    ImageSize = new Point(imagesInList[hovering - 1].Width, imagesInList[hovering - 1].Height);
+                }
             }
             catch (IOException ex)
             {
                 OutputText = "File input error: " + ex.Message;
-                ErrorTimeOut = 100;
+                ErrorTimeOut = 1000;
             }
+        }
+
+        bool DoesImagesInListHaveMoreThan1Images()
+        {
+            int amountOfImages = 0;
+            for (int i = 0; i < imagesInList.Length; i++ )
+            {
+                if (imagesInList[i] != null)
+                    amountOfImages++;
+            }
+
+                return (amountOfImages > 1)? true : false;
         }
 
         /// <summary>
@@ -377,13 +413,7 @@ namespace MarsImageThing
 
             spriteBatch.Begin();
 
-
-                if(BackgroundBlack)
-                    spriteBatch.DrawString(font, "Please import the images.", new Vector2(50, 5), Microsoft.Xna.Framework.Color.White);
-                else
-                    spriteBatch.DrawString(font, "Please import the images.", new Vector2(50, 5), Microsoft.Xna.Framework.Color.Black);
-
-                if (imagesInList[0] != null && colorOn < 6)
+                if (DoesImagesInListHaveMoreThan1Images() && colorOn < 6)
                 {
                     if (!hoveringOverNewPointButton)
                         spriteBatch.Draw(whiteBox, new Rectangle(304, 219, 100, 25), Color.LightGray);
@@ -394,7 +424,7 @@ namespace MarsImageThing
 
                     spriteBatch.DrawString(font, "Add Point", new Vector2(304, 219), Color.Black);
                 }
-                if (imagesInList[0] != null && colorOn > 0)
+                if (DoesImagesInListHaveMoreThan1Images() && colorOn > 0)
                 {
                     if (!hoveringOverRemovePointButton)
                         spriteBatch.Draw(whiteBox, new Rectangle(429, 219, 125, 25), Color.LightGray);
@@ -417,7 +447,7 @@ namespace MarsImageThing
                     spriteBatch.DrawString(font, "Classify", new Vector2(304, 259), Color.Black);
                 }
 
-                if (imagesInList[0] != null)
+                if (DoesImagesInListHaveMoreThan1Images())
                 {
                     if (!hoveringOverClearButton)
                         spriteBatch.Draw(whiteBox, new Rectangle(429, 259, 100, 25), Color.LightGray);
@@ -429,16 +459,30 @@ namespace MarsImageThing
                     spriteBatch.DrawString(font, "Clear", new Vector2(429, 259), Color.Black);
                 }
 
+                if(DoesImagesInListHaveMoreThan1Images()) 
+                {
+                    spriteBatch.Draw(whiteBox, new Rectangle(103, 290, 25 * 5, 25), Color.LightGray); //center 256/2 + 25, 256+10
+                    spriteBatch.Draw(whiteDot, new Rectangle(153 + (cameraImagesAreFrom * 50), 290, 25, 25), Color.Blue);
+                    spriteBatch.DrawString(font, "Left     Both    Right", new Vector2(103, 290 + 25 + 10), Color.Black);
+
+                    
+                }
+
                 if(classifyedImage != null)
                 {
 
                     spriteBatch.Draw(classifyedImage, new Rectangle(855 - (256 + 25), 25, 256, 256), Color.White);
+                    if(ErrorTimeOut > 0)
+                        spriteBatch.DrawString(font, OutputText, new Vector2(300, 100), Color.Black);
                 }
                 else
                     spriteBatch.DrawString(font, OutputText, new Vector2(300,100), Color.Black);
                 
                 for (int i = imagesInList.Length; i > 0; i--)
                 {
+                    if (DoesImagesInListHaveMoreThan1Images() && hoveringOver == 0 && imagesInList[i - 1] == null)
+                        continue;
+
                     if (hoveringOver != i)
                         spriteBatch.Draw((imagesInList[(i - 1)] == null) ? BlankImage : imagesInList[(i - 1)], new Microsoft.Xna.Framework.Rectangle(25 + (i - 1) * openStackValuePer, 25, 256, 256), Microsoft.Xna.Framework.Color.White);
                 }
@@ -453,12 +497,12 @@ namespace MarsImageThing
                     spriteBatch.DrawString(font, "x=" + ((colorOn - 1 == i && findingPoint) ? finding.X.ToString() : ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero)? spectralDataPoints[i].point.X.ToString() : "none")), new Vector2(40 + i * (855 / 6), 410), Color.Black);
                     spriteBatch.DrawString(font, "y=" + ((colorOn - 1 == i && findingPoint) ? finding.Y.ToString() : ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? spectralDataPoints[i].point.Y.ToString() : "none")), new Vector2(40 + i * (855 / 6), 425), Color.Black);
                     if (spectralDataPoints.Count > i && spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero && hoveringOver == 0)
-                        spriteBatch.Draw(whiteDot, new Rectangle(spectralDataPoints[i].point.X + 25 - 5, -spectralDataPoints[i].point.Y + 25 + 256 - 5, 10, 10), colors[i]);
+                        spriteBatch.Draw(whiteDot, new Rectangle((spectralDataPoints[i].point.X*256/ImageSize.X) + 25 - 5, (-spectralDataPoints[i].point.Y* 256/ImageSize.Y) + 25 + 256 - 5, 10, 10), colors[i]);
                     
                 }
 
 
-                //spriteBatch.DrawString(font, "(" + x + "," + y + ")", new Vector2(0, 465), Microsoft.Xna.Framework.Color.Black);
+                spriteBatch.DrawString(font, "(" + x + "," + y + ")", new Vector2(0, 465), Microsoft.Xna.Framework.Color.Black);
 
             spriteBatch.End();
 
