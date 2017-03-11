@@ -110,7 +110,8 @@ Something like: (image coming soon)
 
 # Usage
 The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
-The images must be in .jpg format and the example images can be found in: MarsImageThing/MartianProjectImages/
+The images must be in .jpg format and the example images can be found in: MarsImageThing/MartianProjectImages/  
+All of the images are from [http://anserver1.eprsl.wustl.edu/](http://anserver1.eprsl.wustl.edu/) from oppritunity.
 To add spectral data to classify with, use a .asc file, examples can be found in: (coming soon) or at [https://speclab.cr.usgs.gov/spectral.lib06/](https://speclab.cr.usgs.gov/spectral.lib06/)
 
 
