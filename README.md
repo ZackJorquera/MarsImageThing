@@ -8,7 +8,7 @@ The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
 
 ## How The Code Works to Classify The Images
 ### Key Concepts
-In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 750nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only the colors from the visible spectrum and infrared are used as filters for the cameras.
+In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 750nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR are used as filters for the cameras.
 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
@@ -84,6 +84,8 @@ Vector values can be set to that same value as the brightness of each pixel, rep
 #### Variation 2
 Vector a is set in the same way as in Variation 1, while vector b is set using spectral data from a list of data points. To do this a Reflection vs. wavelength graph must be used as F(x), it should return the % reflection when x is equal to the wavelength. This can be done using the known wavelength of each filter on each camera.
 ![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/detailsub.png)
+To get the wavelengths for each filter use this chart:
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/CameraFilterCharacteristics.png)
 
 ### Part 4: Classification
 This is where it iterates over each pixel of the classiﬁedImage and selects the maximum value for the Cos(θ) respective to that pixel and that of vector b.
@@ -120,4 +122,4 @@ Last edit: 3/8/2017
 
 Made By: Zack Jorquera
 
-Thanks to Samuel Estrella for the original concept
+Thanks to Samuel Estrella for the original concept for classification
