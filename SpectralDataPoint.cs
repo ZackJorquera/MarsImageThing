@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
@@ -10,82 +10,98 @@ using Microsoft.Xna.Framework;
 
 namespace MarsImageThing
 {
+    struct OutPutImageData
+    {
+        public Stream outPutImageStream;
+        public Exception IOErrorException;
+    }
     class SpectralData
     {
         public Microsoft.Xna.Framework.Point point = new Microsoft.Xna.Framework.Point();
-        public float[] vector = new float[8];
-        public int[] SpectralWaveLengthForEachFilterLeft = { 739,753,673,601,535,482,432,440}; //4.00-1.000 microMeters
-        public int[] SpectralWaveLengthForEachFilterRight = { 739, 753, 673, 601, 535, 482, 432, 440 }; //4.00-1.000 microMeters
+        Stream spectralDataPlotLocation;
+        int cameraImagesAreFrom;
+        int[] SpectralWaveLengthForEachFilterLeft = { 739, 753, 673, 601, 535, 482, 432, 440 }; //does not include L0
+        int[] SpectralWaveLengthForEachFilterRight = { 436, 754, 803, 864, 904, 934, 1009, 880 };//or R0
 
-        public SpectralData(Microsoft.Xna.Framework.Point Point , Stream SpectralDataPlotLocation)
+        public SpectralData(Microsoft.Xna.Framework.Point Point, Stream SpectralDataPlotLocation, int CameraImagesAreFrom)
         {
-            if(SpectralDataPlotLocation != null)
-                vector = GetReflectanceVectorFromPlotFile(SpectralWaveLengthForEachFilterLeft, SpectralDataPlotLocation);
             point = Point;
-            
+            spectralDataPlotLocation = SpectralDataPlotLocation;
+            cameraImagesAreFrom = CameraImagesAreFrom;
         }
-        float[] GetReflectanceVectorFromPlotFile(int[] WaveLengths, Stream SpectralDataPlotLocation)
+        public float[] GetReflectanceVectorFromPlotFile()
         {
-            float[] vector = new float[8];
-
-            using(StreamReader SR = new StreamReader(SpectralDataPlotLocation))
+            List<int> WaveLengths = new List<int>();
+            if (cameraImagesAreFrom == -1)
+                WaveLengths = SpectralWaveLengthForEachFilterLeft.ToList();
+            else if (cameraImagesAreFrom == 1)
+                WaveLengths = SpectralWaveLengthForEachFilterRight.ToList();
+            else
             {
-                char[] fullText = SR.ReadToEnd().ToCharArray();
-                int dataPointNum = 0;
-                bool gettingPoint = false;
-                bool startLookingForData = false;
-                string[] currentDataPoint = {"","",""};
-                for(int i = 0; i < fullText.LongLength; i++)
+                WaveLengths = SpectralWaveLengthForEachFilterLeft.ToList();
+                WaveLengths.Concat(SpectralWaveLengthForEachFilterRight.ToList());
+            }
+
+            float[] vector = new float[WaveLengths.Count];
+
+                using (StreamReader SR = new StreamReader(spectralDataPlotLocation))
                 {
-                    if (!startLookingForData)
+                    char[] fullText = SR.ReadToEnd().ToCharArray();
+                    int dataPointNum = 0;
+                    bool gettingPoint = false;
+                    bool startLookingForData = false;
+                    string[] currentDataPoint = { "", "", "" };
+                    for (int i = 0; i < fullText.LongLength; i++)
                     {
-                        if(i + 15 == fullText.LongLength)
-                            break;
-                        startLookingForData = true;
-                        for (int j = 0; j < 14; j++ )//looks for 14 [spaces] before starting to collect data. this avoides the junk that the begining
+                        if (!startLookingForData)
                         {
-                            if (fullText[i + j] != ' ')
-                                startLookingForData = false;
-                        }
-                        continue;
-                    }
-
-                    if (fullText[i] == ' ' || i == fullText.LongLength-1)
-                    {
-                        if(gettingPoint)
-                        {
-                            if (currentDataPoint[dataPointNum % 3].Length <= 2 || currentDataPoint[0] == "-1.23e34")
-                                continue;
-                            if (dataPointNum % 3 == 2)
+                            if (i + 15 >= fullText.LongLength)
+                                break;
+                            startLookingForData = true;
+                            for (int j = 0; j < 14; j++)//looks for 14 [Spaces] or [New Line] before starting to collect data. this avoides the junk that the begining
                             {
+                                if (fullText[i + j] != (char)32 && fullText[i + j] != (char)10)
+                                    startLookingForData = false;
+                            }
+                            continue;
+                        }
 
-                                float waveLength = float.Parse(currentDataPoint[0]) * 1000;
-                                for(int j = 0; j < WaveLengths.Length;j++)
+                        if (fullText[i] == (char)32 || fullText[i] == (char)10 || i == fullText.LongLength - 1)
+                        {
+                            if (gettingPoint)
+                            {
+                                if (currentDataPoint[dataPointNum % 3].Length <= 2 || currentDataPoint[0] == "-1.23e34")
+                                    continue;
+                                if (dataPointNum % 3 == 2)
                                 {
-                                    float waveLengthToGet = (float)WaveLengths[j];
 
-                                    if(waveLength == waveLengthToGet)
+                                    float waveLength = float.Parse(currentDataPoint[0]) * 1000;
+                                    for (int j = 0; j < WaveLengths.Count; j++)
                                     {
-                                        vector[j] = float.Parse(currentDataPoint[1]);
+                                        float waveLengthToGet = (float)WaveLengths[j];
+
+                                        if (waveLength == waveLengthToGet)
+                                        {
+                                            vector[j] = float.Parse(currentDataPoint[1]);
+                                        }
                                     }
                                 }
+                                dataPointNum++;
+
                             }
-                            dataPointNum++;
-                            
+                            gettingPoint = false;
                         }
-                        gettingPoint = false;
-                    }
-                    else
-                    {
-                        if(!gettingPoint)
+                        else
                         {
-                            currentDataPoint[dataPointNum % 3] = "";
+                            if (!gettingPoint)
+                            {
+                                currentDataPoint[dataPointNum % 3] = "";
+                            }
+                            gettingPoint = true;
+                            currentDataPoint[dataPointNum % 3] += fullText[i];
                         }
-                        gettingPoint = true;
-                        currentDataPoint[dataPointNum % 3] += fullText[i];
                     }
                 }
-            }
             return vector;
         }
     }
