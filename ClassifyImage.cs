@@ -14,52 +14,65 @@ namespace MarsImageThing
     class ClassifyImage
     {
 
-        public Stream Classify(string[] ImageLocations, List<SpectralData> spectralDataPoints)
+        public OutPutImageData Classify(string[] ImageLocations, List<SpectralData> spectralDataPoints, int cameraImagesAreFrom, Microsoft.Xna.Framework.Point ImageSize)
         {
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "Image File (*.png)|*.png|All files (*.*)|*.*";
             sfd.FilterIndex = 1;
             sfd.RestoreDirectory = true;
-            Stream stream;
+            OutPutImageData outPutData;
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
-                    if ((stream = sfd.OpenFile()) != null)
+                    if ((outPutData.outPutImageStream = sfd.OpenFile()) != null)
                     {
-                        Bitmap outputImage = new Bitmap(256,256);
+                        Bitmap outputImage = new Bitmap(ImageSize.X, ImageSize.Y);
                         System.Drawing.Color[] colors = { System.Drawing.Color.FromName("Red"), System.Drawing.Color.FromName("Blue"), System.Drawing.Color.FromName("Green"), System.Drawing.Color.FromName("Orange"), System.Drawing.Color.FromName("Gold"), System.Drawing.Color.FromName("Purple") };
-                        Bitmap[] imageList = new Bitmap[6];
+                        Bitmap[] imageList = new Bitmap[8];
+                        List<float[]> spectralDataVector = new List<float[]>();
+
 
                         for(int i = 0; i < ImageLocations.Length; i++)
                         {
                             if (ImageLocations[i] != null)
                             {
                                 Bitmap tempImage = new Bitmap(ImageLocations[i]);
-                                if (tempImage.Size.Height == tempImage.Size.Width && tempImage.Size.Width == 256)
+                                if (ImageSize == Microsoft.Xna.Framework.Point.Zero)
+                                    ImageSize = new Microsoft.Xna.Framework.Point(tempImage.Width, tempImage.Height);
+                                if (tempImage.Size.Height == ImageSize.Y && tempImage.Size.Width == ImageSize.X)
                                     imageList[i] = tempImage;
                             }
                         }
 
-                        double[, ,] classifyedImage = new double[256, 256, spectralDataPoints.Count];
+                        for(int i = 0; i < spectralDataPoints.Count; i ++)
+                        {
+                            if (spectralDataPoints[i].point == Microsoft.Xna.Framework.Point.Zero)
+                                spectralDataVector.Add(spectralDataPoints[i].GetReflectanceVectorFromPlotFile());
+                            else
+                                spectralDataVector.Add(null);
+                        }
+
+                        double[, ,] classifyedImage = new double[ImageSize.X, ImageSize.Y, spectralDataPoints.Count];
 
                         for (int i = 0; i < spectralDataPoints.Count; i++)
                         {
-                            for (int x = 0; x < 256; x++)
+                            for (int x = 0; x < ImageSize.X; x++)
                             {
-                                for (int y = 0; y < 256; y++)
+                                for (int y = 0; y < ImageSize.Y; y++)
                                 {
                                     double sum = 0;
                                     double aMag = 0;
                                     double bMag = 0;
+                                    
                                     for(int j = 0; j < imageList.Length; j++)//dot product
                                     {
                                         if (imageList[j] == null)
                                             continue;
                                         aMag += Math.Pow(Convert.ToInt16(imageList[j].GetPixel(x, y).B.ToString(), 10), 2);
-                                        bMag += Math.Pow((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? Convert.ToInt16(imageList[j].GetPixel(spectralDataPoints[i].point.X, spectralDataPoints[i].point.Y).B.ToString(), 10) : spectralDataPoints[i].vector[j] * 255, 2);
-                                        sum += Convert.ToInt16(imageList[j].GetPixel(x, y).B.ToString(), 10) * ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? Convert.ToInt16(imageList[j].GetPixel(spectralDataPoints[i].point.X, spectralDataPoints[i].point.Y).B.ToString(), 10) : spectralDataPoints[i].vector[j] * 255);
+                                        bMag += Math.Pow((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? Convert.ToInt16(imageList[j].GetPixel(spectralDataPoints[i].point.X, spectralDataPoints[i].point.Y).B.ToString(), 10) : spectralDataVector[i][j] * 255, 2);
+                                        sum += Convert.ToInt16(imageList[j].GetPixel(x, y).B.ToString(), 10) * ((spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? Convert.ToInt16(imageList[j].GetPixel(spectralDataPoints[i].point.X, spectralDataPoints[i].point.Y).B.ToString(), 10) : spectralDataVector[i][j] * 255);
                                     }
                                     aMag = Math.Sqrt(aMag);
                                     bMag = Math.Sqrt(bMag);
@@ -69,14 +82,14 @@ namespace MarsImageThing
                             }
                         }
 
-                        for (int x = 0; x < 256; x++)
+                        for (int x = 0; x < ImageSize.X; x++)
                         {
-                            for (int y = 0; y < 256; y++)
+                            for (int y = 0; y < ImageSize.Y; y++)
                             {
-                                int pointClosest = 6;
+                                int pointClosest = -1;
                                 for (int i = 0; i < spectralDataPoints.Count; i++)
                                 {
-                                    if(pointClosest == 6)
+                                    if(pointClosest == -1)
                                     {
                                         pointClosest = i;
                                         continue;
@@ -92,16 +105,21 @@ namespace MarsImageThing
                                 outputImage.SetPixel(x, y, colors[pointClosest]);
                             }
                         }
-                        outputImage.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                        return stream;
+                        outputImage.Save(outPutData.outPutImageStream, System.Drawing.Imaging.ImageFormat.Png);
+                        outPutData.IOErrorException = null;
+                        return outPutData;
                     }
                 }
                 catch(Exception ex)
                 {
                     Console.WriteLine("Error: " + ex.Message);
+                    outPutData.IOErrorException = ex;
+                    outPutData.outPutImageStream = null;
+                    return outPutData;
+
                 }
             }
-        return null;
+            return new OutPutImageData();
         }
     }
 }
