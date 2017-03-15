@@ -112,7 +112,7 @@ for (int x = 0; x < ImageSize.X; x++)
 ```
 #### Output
 Something like: 
-![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png, "Wow,there is magnetite in rocks on mars!!! The more you know.")
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow,there is magnetite in rocks on mars!!! The more you know.")
 
 # Usage
 The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
