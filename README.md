@@ -2,13 +2,13 @@
 This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
 # Code
-This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) for Visual Studios.
+This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios.
 All code for the UI can be found in: MarsImageThing/Game1.cs
-The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs
+The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs and MarsImageThing/SpectralDataPoint.cs
 
 ## How The Code Works to Classify The Images
 ### Key Concepts
-In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 700nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR are used as filters for the cameras0
+In everyday life, everything absorbs and reflects light, this, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 700nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR wavelengths are used as filters for the cameras.
 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
@@ -32,7 +32,7 @@ if (openFileDialog.ShowDialog() == DialogResult.OK)
 In this example the file is never used, but the file location is saved to the variable stream when stream = openFileDialog2.OpenFile() was used. Also for Part 4 this same methed can be used to save the file, use System.Windows.Forms.SaveFileDiolog.
 
 ### Part 2: Declaring Variables
-Here the file paths are converted in to a System.Drawing.BitMap where each pixel can be used independently:
+Here, the file paths are converted in to a System.Drawing.BitMap where each pixel can be used independently:
 ```c#
 for(int i = 0; i < ImageLocations.Length; i++)
 {
@@ -78,10 +78,10 @@ for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
     }
 }
 ```
-An important thing to note is that when using both the right and left cameras, there must be a smaller x dimension to compensate for the offset of the cameras; Meaning that the value of imageSize.X will be smaller than the origanal images. All of this data can be found with the images.
+An important thing to note is that when using both the right and left cameras, there must be a smaller x dimension to compensate for the offset of the cameras; Meaning that the value of imageSize.X will be smaller than the original images. All of this data can be found with the images.
 
 #### Variation 1
-Vector values can be set to that same value as the brightness of each pixel, represented by the Red, Green or Blue values (I used the Blue value). This is done for both vector a and b, where vector a is the current pixel and vector b is the location of the clicked point. 
+Vector values can be set to that same value as the brightness of each pixel, represented by the Red, Green or Blue values (I used the Blue value). This is done for both vectors a and b, where vector a is the current pixel and vector b is the location of the clicked point. 
 ![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/type%201%20classification.gif)
 
 #### Variation 2
@@ -110,9 +110,10 @@ for (int x = 0; x < ImageSize.X; x++)
     }
 }
 ```
-#### Output
+### Output
 Something like: 
 ![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow,there is magnetite in rocks on mars!!! The more you know.")
+The first point is set to the dirt and dust around the rocks and the second point is set to the spectral data file for magnetite, MarsImageThing/SpectralData/magnetite_hs78.13233.asc, which is commonly found in the rocks on mars.
 
 # Usage
 The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
