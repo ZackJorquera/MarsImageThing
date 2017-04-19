@@ -6,12 +6,12 @@ using System.Windows.Forms;
 using System.IO;
 using System.Text;
 using System.Linq;
+using System;
+
 
 namespace MarsImageThing
 {
-    /// <summary>
-    /// This is the main type for your game.
-    /// </summary>
+    
     public class Game1 : Game
     {
         GraphicsDeviceManager graphics;
@@ -44,6 +44,7 @@ namespace MarsImageThing
         Point finding;
         Texture2D whiteDot;
 
+        //ClassifyImagesWithThreads ClassifyImage = new ClassifyImagesWithThreads();
         ClassifyImage ClassifyImage = new ClassifyImage();
         bool Classifying = false;
         Texture2D classifyedImage;
@@ -66,12 +67,6 @@ namespace MarsImageThing
             Content.RootDirectory = "Content";
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
@@ -86,10 +81,6 @@ namespace MarsImageThing
 
         }
 
-        /// <summary>
-        /// LoadContent will be called once per game and is the place to load
-        /// all of your content.
-        /// </summary>
         protected override void LoadContent()
         {
             // Create a new SpriteBatch, which can be used to draw textures.
@@ -102,21 +93,13 @@ namespace MarsImageThing
 
         }
 
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
         protected override void UnloadContent()
         {
             // TODO: Unload any non ContentManager content here
 
         }
 
-        /// <summary>
-        /// Allows the game to run logic such as updating the world,
-        /// checking for collisions, gathering input, and playing audio.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+       
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == Microsoft.Xna.Framework.Input.ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Microsoft.Xna.Framework.Input.Keys.Escape))
@@ -132,10 +115,13 @@ namespace MarsImageThing
                     ImagesToClassify.Concat(ImagesToEdit2.ToList());
                 }
 
-
+                
                 OutPutImageData outPutImagesData = ClassifyImage.Classify(ImagesToClassify.ToArray(), spectralDataPoints, cameraImagesAreFrom, ImageSize);
+
                 if (outPutImagesData.outPutImageStream != null)
+                {
                     classifyedImage = Texture2D.FromStream(GraphicsDevice, outPutImagesData.outPutImageStream);
+                }
                 else
                 {
                     if (outPutImagesData.IOErrorException != null)
@@ -469,10 +455,7 @@ namespace MarsImageThing
                 return (amountOfImages > 1)? true : false;
         }
 
-        /// <summary>
-        /// This is called when the game should draw itself.
-        /// </summary>
-        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        
         protected override void Draw(GameTime gameTime)
         {
             bool BackgroundBlack = false;
