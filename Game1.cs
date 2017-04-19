@@ -8,7 +8,6 @@ using System.Text;
 using System.Linq;
 using System;
 
-
 namespace MarsImageThing
 {
     
@@ -44,7 +43,6 @@ namespace MarsImageThing
         Point finding;
         Texture2D whiteDot;
 
-        //ClassifyImagesWithThreads ClassifyImage = new ClassifyImagesWithThreads();
         ClassifyImage ClassifyImage = new ClassifyImage();
         bool Classifying = false;
         Texture2D classifyedImage;
