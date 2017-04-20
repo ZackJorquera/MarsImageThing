@@ -29,7 +29,7 @@ if (openFileDialog.ShowDialog() == DialogResult.OK)
     }
 }
 ```
-In this example the file is never used, but the file location is saved to the variable stream when stream = openFileDialog2.OpenFile() was used. Also for Part 4 this same methed can be used to save the file, use System.Windows.Forms.SaveFileDiolog.
+In this example the file is never used, but the file location is saved to the variable stream when ```stream = openFileDialog.OpenFile()``` was used. Also for Part 4 this same methed can be used to save the file, use System.Windows.Forms.SaveFileDiolog.
 
 ### Part 2: Declaring Variables
 Here, the file paths are converted in to a System.Drawing.BitMap where each pixel can be used independently:
@@ -78,7 +78,7 @@ for (int i = 0; i < Points.Count; i++)//both Variation 1 and 2
     }
 }
 ```
-An important thing to note is that when using both the right and left cameras, there must be a smaller x dimension to compensate for the offset of the cameras; Meaning that the value of imageSize.X will be smaller than the original images. All of this data can be found with the images.
+An important thing to note is that when using both the right and left cameras, there must be a smaller x dimension to compensate for the offset of the cameras; Meaning that the value of ```imageSize.X``` will be smaller than the original images. All of this data can be found with the images.
 
 #### Variation 1
 Vector values can be set to that same value as the brightness of each pixel, represented by the Red, Green or Blue values (I used the Blue value). This is done for both vectors a and b, where vector a is the current pixel and vector b is the location of the clicked point. 
@@ -110,6 +110,45 @@ for (int x = 0; x < ImageSize.X; x++)
     }
 }
 ```
+
+### Part 5: Parallel Computing
+To make the previous two steps work faster Parallel Computing was used. This is where the image is being processed at the same time by different threads. The reason why this is a possibility is because each pixel is computed independently of each other pixel.
+To acomplish this I used this code:
+```c#
+ManualResetEvent[] doneEvents = new ManualResetEvent[36];
+List<ClassifyPixles> CPList = new List<ClassifyPixles>();
+for (int i = 0; i < calculationRectangles.Length; i++)
+{
+    doneEvents[i] = new ManualResetEvent(false);
+    ClassifyPixles CP = new ClassifyPixles(_imageSize, imageList, spectralDataPoints, spectralDataVector, calculationRectangles[i], doneEvents[i]);
+    CPList.Add(CP);
+    ThreadPool.QueueUserWorkItem(CP.ThreadPoolCallback, i);
+}
+foreach (var thread in doneEvents)//waits for all of the threads to finish.
+    thread.WaitOne();
+
+```
+Where ```ClassifyPixles``` is a class that is used to run the thread given by the ```ThreadPool.QueueUserWorkItem(CP.ThreadPoolCallback, i);``` line. The reason why the variable type ManualResetEvent is used is because it allows for the ability to wait for the threads to finish when the time it takes for the thread to calculate is unknown. In this example, the image was split into 36 different parts. These sections are stored in the array ```calculationRectangles``` as a System.Drawing.Rectangle.
+
+The ```ClassifyPixles``` class then computes the pixels in a given range from the ```ThreadPoolCallback``` function. 
+```c#
+public void ThreadPoolCallback(Object threadContext)
+{
+    int threadIndex = (int)threadContext;
+    Console.WriteLine("thread {0} started...", threadIndex);
+    for (int x = _range.X; x < _range.X + _range.Width; x++)
+    {
+        for (int y = _range.Y; y < _range.Y + _range.Height; y++)
+        {
+            _pixles[x, y] = FindPixleColor(new System.Drawing.Point(x, y));
+        }
+    }
+    Console.WriteLine("thread {0} result calculated...", threadIndex);
+    _doneEvent.Set();
+}
+```
+The threadIndex variable is just for debug purposes, it is not used for any computational purposes.
+
 ### Output
 Something like: 
 ![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow,there is magnetite in rocks on mars!!! The more you know.")
@@ -123,8 +162,8 @@ To add spectral data to classify with, use a .asc file, examples can be found in
 
 
 # Info
-Last edit: 3/8/2017
+Last edit: 4/19/2017
 
 Made By: Zack Jorquera
 
-Thanks to Samuel Estrella for the original concept for classification
+Thanks to Samuel Estrella for the original concept for the classification allgorithm.
