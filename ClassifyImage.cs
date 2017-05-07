@@ -70,7 +70,7 @@ namespace MarsImageThing
                         }
 
 
-                        ManualResetEvent[] doneEvents = new ManualResetEvent[36];//remove the thread stuff
+                        ManualResetEvent[] doneEvents = new ManualResetEvent[36];
                         List<ClassifyPixles> CPList = new List<ClassifyPixles>();
 
 
