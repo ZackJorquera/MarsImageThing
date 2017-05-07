@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +16,10 @@ namespace MarsImageThing
     class ClassifyImage
     {
 
-        Bitmap outputImage;
-        Bitmap[] imageList = new Bitmap[8];
+        Bitmap outputImage;//outputImage
+        Bitmap[] imageList = new Bitmap[8];//List of input images
         OutPutImageData outPutData;
-        public List<SpectralData> spectralDataPoints = new List<SpectralData>();
-        List<float[]> spectralDataVector = new List<float[]>();
-        System.Drawing.Color[] colors = { System.Drawing.Color.FromName("Red"), System.Drawing.Color.FromName("Blue"), System.Drawing.Color.FromName("Green"), System.Drawing.Color.FromName("Orange"), System.Drawing.Color.FromName("Gold"), System.Drawing.Color.FromName("Purple") };
-
-
+        List<float[]> spectralDataVector = new List<float[]>();//For use of input by stectral data
 
 
         public OutPutImageData Classify(string[] ImageLocations, List<SpectralData> SpectralDataPoints, int cameraImagesAreFrom, Microsoft.Xna.Framework.Point ImageSize)
@@ -34,7 +30,7 @@ namespace MarsImageThing
             sfd.RestoreDirectory = true;
             System.Drawing.Point _imageSize = new System.Drawing.Point(ImageSize.X, ImageSize.Y);
 
-            spectralDataPoints = SpectralDataPoints;
+            _spectralDataPoints = SpectralDataPoints;
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
@@ -47,7 +43,7 @@ namespace MarsImageThing
 
                         for (int i = 0; i < ImageLocations.Length; i++)
                         {
-                            if (ImageLocations[i] != null)
+                            if (ImageLocations[i] != null)//only exepts images with the same size as the first
                             {
                                 Bitmap tempImage = new Bitmap(ImageLocations[i]);
                                 if (_imageSize == (new System.Drawing.Point(0, 0)))
@@ -57,16 +53,24 @@ namespace MarsImageThing
                             }
                         }
 
-                        for (int i = 0; i < spectralDataPoints.Count; i++)
+                        for (int i = 0; i < _spectralDataPoints.Count; i++)//Gets the values from the reflection data files and selected points
                         {
-                            if (spectralDataPoints[i].point == Microsoft.Xna.Framework.Point.Zero)
-                                spectralDataVector.Add(spectralDataPoints[i].GetReflectanceVectorFromPlotFile());
+                            if (_spectralDataPoints[i].Point == Microsoft.Xna.Framework.Point.Zero)
+                                spectralDataVector.Add(_spectralDataPoints[i].GetReflectanceVectorFromPlotFile());//Gets the vector from the reflectance file
                             else
-                                spectralDataVector.Add(null);
+                            {
+                                float[] tempVector = new float[imageList.Length];
+                                for (int j = 0; j < imageList.Length; j++)
+                                {
+                                    if (imageList[j] != null)
+                                        tempVector[j] = float.Parse(imageList[j].GetPixel(_spectralDataPoints[i].Point.X, _spectralDataPoints[i].Point.Y).B.ToString()) / 255;
+                                }
+                                spectralDataVector.Add(tempVector);
+                            }
                         }
 
 
-                        ManualResetEvent[] doneEvents = new ManualResetEvent[36];
+                        ManualResetEvent[] doneEvents = new ManualResetEvent[36];//remove the thread stuff
                         List<ClassifyPixles> CPList = new List<ClassifyPixles>();
 
 
@@ -93,7 +97,7 @@ namespace MarsImageThing
                         for (int i = 0; i < calculationRectangles.Length; i++)
                         {
                             doneEvents[i] = new ManualResetEvent(false);
-                            ClassifyPixles CP = new ClassifyPixles(_imageSize, imageList, spectralDataPoints, spectralDataVector, calculationRectangles[i], doneEvents[i]);
+                            ClassifyPixles CP = new ClassifyPixles(_imageSize, imageList, _spectralDataPoints, spectralDataVector, calculationRectangles[i], doneEvents[i]);
                             CPList.Add(CP);
                             ThreadPool.QueueUserWorkItem(CP.ThreadPoolCallback, i);
                         }
@@ -133,6 +137,83 @@ namespace MarsImageThing
             }
             return new OutPutImageData();
         }
+
+        public OutPutImageData ColorImage(string[] ImageLocations, Microsoft.Xna.Framework.Point ImageSize)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Image File (*.png)|*.png|All files (*.*)|*.*";
+            sfd.FilterIndex = 1;
+            sfd.RestoreDirectory = true;
+            System.Drawing.Point _imageSize = new System.Drawing.Point(ImageSize.X, ImageSize.Y);
+
+            _spectralDataPoints = SpectralDataPoints;
+
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    if ((outPutData.outPutImageStream = sfd.OpenFile()) != null)
+                    {
+                        outputImage = new Bitmap(_imageSize.X, _imageSize.Y);
+
+
+                        for (int i = 0; i < ImageLocations.Length; i++)
+                        {
+                            if (ImageLocations[i] != null)//only exepts images with the same size as the first
+                            {
+                                Bitmap tempImage = new Bitmap(ImageLocations[i]);
+                                if (_imageSize == (new System.Drawing.Point(0, 0)))
+                                    _imageSize = new System.Drawing.Point(tempImage.Width, tempImage.Height);
+                                if (tempImage.Size.Height == _imageSize.Y && tempImage.Size.Width == _imageSize.X)
+                                    imageList[i] = tempImage;
+                            }
+                        }
+
+                        Bitmap redImage = null, greenImage = null, blueImage = null;
+                        if(imageList[2] != null && imageList[4] != null && imageList[5] != null)
+                        {
+                            redImage = imageList[2];
+                            greenImage = imageList[4];
+                            blueImage = imageList[5];
+                        }
+                        else if (imageList[1] != null && imageList[4] != null && imageList[6] != null)
+                        {
+                            redImage = imageList[1];
+                            greenImage = imageList[4];
+                            blueImage = imageList[6];
+                        }
+                        if (redImage != null && greenImage != null && blueImage != null)
+                        {
+                            for (int x = 0; x < _imageSize.X; x++)
+                            {
+                                for (int y = 0; y < _imageSize.Y; y++)
+                                {
+                                    outputImage.SetPixel(x, y, System.Drawing.Color.FromArgb(255, imageList[2].GetPixel(x, y).R, imageList[4].GetPixel(x, y).G, imageList[5].GetPixel(x, y).B));
+                                }
+                            }
+
+                            outputImage.Save(outPutData.outPutImageStream, System.Drawing.Imaging.ImageFormat.Png);
+                            outPutData.IOErrorException = null;
+                            return outPutData;
+                        }
+                        
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: " + ex.Message);
+                    outPutData.IOErrorException = ex;
+                    outPutData.outPutImageStream = null;
+                    return outPutData;
+
+                }
+            }
+            return new OutPutImageData();
+        }
+
+        public List<SpectralData> SpectralDataPoints { get { return _spectralDataPoints; } }
+        private List<SpectralData> _spectralDataPoints = new List<SpectralData>();
+
     }
     class ClassifyPixles
     {
@@ -152,7 +233,7 @@ namespace MarsImageThing
 
         }
 
-        // Wrapper method for use with thread pool.
+
         public void ThreadPoolCallback(Object threadContext)
         {
             int threadIndex = (int)threadContext;
@@ -168,13 +249,13 @@ namespace MarsImageThing
             _doneEvent.Set();
         }
 
-        // Recursive method that calculates the Nth Fibonacci number.
+
         System.Drawing.Color FindPixleColor(System.Drawing.Point thisPoint)
         {
 
             double[] classifyedPixleValues = new double[_spectralDataPoints.Count];
 
-            for (int i = 0; i < _spectralDataPoints.Count; i++)
+            for (int i = 0; i < _spectralDataPoints.Count; i++)//make the two vectors from the image do the dot product
             {
                 double sum = 0;
                 double aMag = 0;
@@ -184,25 +265,23 @@ namespace MarsImageThing
                 {
                     if (_imageList[j] == null)
                         continue;
-                    int a = 0;
-                    int b = 0;
+                    int a = -1;
                     lock (_imageList[j])
                     {
                         a = Convert.ToInt16(_imageList[j].GetPixel(thisPoint.X, thisPoint.Y).B.ToString(), 10);
-                        b = Convert.ToInt16(_imageList[j].GetPixel(_spectralDataPoints[i].point.X, _spectralDataPoints[i].point.Y).B.ToString(), 10);
                     }
-                    while ((a | b) == 0)
+                    while (a == -1)
                     {
                         Thread.Sleep(5);
                     }
                     aMag += Math.Pow(a, 2);
-                    bMag += Math.Pow((_spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? b : _spectralDataVector[i][j] * 255, 2);
-                    sum += a * ((_spectralDataPoints[i].point != Microsoft.Xna.Framework.Point.Zero) ? b : _spectralDataVector[i][j] * 255);
+                    bMag += Math.Pow(_spectralDataVector[i][j] * 255, 2);
+                    sum += a * (_spectralDataVector[i][j] * 255);
                 }
                 aMag = Math.Sqrt(aMag);
                 bMag = Math.Sqrt(bMag);
 
-                classifyedPixleValues[i] = (sum) / (aMag * bMag);
+                classifyedPixleValues[i] = (sum) / (aMag * bMag);// set the dot product value to the position in the image of vector a in the form of cos(theta)
             }
             int pointClosest = -1;
             for (int i = 0; i < _spectralDataPoints.Count; i++)
@@ -220,7 +299,7 @@ namespace MarsImageThing
                     }
                 }
             }
-            return colors[pointClosest];
+            return colors[pointClosest];//return the color relating to the image with the greatest value at the location
 
         }
 

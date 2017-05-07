@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
@@ -10,36 +10,36 @@ using Microsoft.Xna.Framework;
 
 namespace MarsImageThing
 {
-    struct OutPutImageData
+    struct OutPutImageData//This allows for the classify function to output any errors that occured and the image
     {
         public Stream outPutImageStream;
         public Exception IOErrorException;
     }
+
     class SpectralData
     {
-        public Microsoft.Xna.Framework.Point point = new Microsoft.Xna.Framework.Point();
-        public Stream spectralDataPlotLocation;
-        public String fileName;
-        int cameraImagesAreFrom;
-        int[] SpectralWaveLengthForEachFilterLeft = { 739, 753, 673, 601, 535, 482, 432, 440 }; //does not include L0
-        int[] SpectralWaveLengthForEachFilterRight = { 436, 754, 803, 864, 904, 934, 1009, 880 };//or R0
+        int _cameraImagesAreFrom;
+        int[] SpectralWaveLengthForEachFilterLeft = { 739, 753, 673, 601, 535, 482, 432, 440 }; //filter waveleanght for filters L12345678
+        int[] SpectralWaveLengthForEachFilterRight = { 436, 754, 803, 864, 904, 934, 1009, 880 };//filter waveleanght for filters R12345678
+        //red green blue filters are L2 L5 L7 or L3 L5 L6
+
 
         public SpectralData(Microsoft.Xna.Framework.Point Point, Stream SpectralDataPlotLocation, int CameraImagesAreFrom)
         {
-            point = Point;
-            spectralDataPlotLocation = SpectralDataPlotLocation;
+            _point = Point;
+            _spectralDataPlotLocation = SpectralDataPlotLocation;
 
-            if (spectralDataPlotLocation != null)
-                fileName = (spectralDataPlotLocation as FileStream).Name.Split('\\').Last().Split('.').First();//((FileStream)spectralDataPlotLocation) would of also work
+            if (_spectralDataPlotLocation != null)
+                _fileName = (_spectralDataPlotLocation as FileStream).Name.Split('\\').Last().Split('.').First();//((FileStream)spectralDataPlotLocation) would of also work
 
-            cameraImagesAreFrom = CameraImagesAreFrom;
+            _cameraImagesAreFrom = CameraImagesAreFrom;
         }
         public float[] GetReflectanceVectorFromPlotFile()
         {
             List<int> WaveLengths = new List<int>();
-            if (cameraImagesAreFrom == -1)
+            if (_cameraImagesAreFrom == -1)//gets the used data wavelenghts to get reflectance data from
                 WaveLengths = SpectralWaveLengthForEachFilterLeft.ToList();
-            else if (cameraImagesAreFrom == 1)
+            else if (_cameraImagesAreFrom == 1)
                 WaveLengths = SpectralWaveLengthForEachFilterRight.ToList();
             else
             {
@@ -48,18 +48,18 @@ namespace MarsImageThing
             }
 
             float[,] vector = new float[WaveLengths.Count, 2];
-            for (int i = 0; i < vector.Length / 2; i ++ )
+            for (int i = 0; i < vector.Length / 2; i++)
             {
                 vector[i, 1] = 100;
             }
 
-            using (StreamReader SR = new StreamReader(spectralDataPlotLocation))
+            using (StreamReader SR = new StreamReader(_spectralDataPlotLocation))
             {
                 char[] fullText = SR.ReadToEnd().ToCharArray();
                 int dataPointNum = 0;
-                bool gettingPoint = false;
-                bool startLookingForData = false;
-                string[] currentDataPoint = { "", "", "" };
+                bool gettingPoint = false;//know when it is reading junk or the values needed
+                bool startLookingForData = false;//means that the next values have data point in them
+                string[] currentDataPoint = { "", "", "" };//wavelength    reflectance    standard deviation
                 for (int i = 0; i < fullText.LongLength; i++)
                 {
                     if (!startLookingForData)
@@ -81,12 +81,12 @@ namespace MarsImageThing
                         {
                             if (!(currentDataPoint[dataPointNum % 3].Length <= 2 || currentDataPoint[0] == "-1.23e34"))
                             {
-                                if (dataPointNum % 3 == 2)//why 2
+                                if (dataPointNum % 3 == 2)
                                 {
                                     float waveLengthFromFile = float.Parse(currentDataPoint[0]) * 1000;
                                     for (int j = 0; j < WaveLengths.Count; j++)
                                     {
-                                        if (currentDataPoint[1] == "-1.23e34")
+                                        if (float.Parse(currentDataPoint[1]) == -1.23e34f)
                                             continue;
 
                                         float waveLengthToBe = WaveLengths[j];
@@ -94,7 +94,7 @@ namespace MarsImageThing
                                         if (Math.Abs(waveLengthFromFile - waveLengthToBe) < vector[j, 1])
                                         {
                                             vector[j, 0] = float.Parse(currentDataPoint[1]);
-                                            vector[j, 1] = Math.Abs(waveLengthFromFile - waveLengthToBe);
+                                            vector[j, 1] = Math.Abs(waveLengthFromFile - waveLengthToBe);//uses this to find the closest value
                                         }
                                     }
                                 }
@@ -116,13 +116,23 @@ namespace MarsImageThing
                 }
                 SR.Close();
             }
-            float[] returnVector = new float[vector.Length / 2];
-            for (int i = 0; i < returnVector.Length; i++ )
+            float[] returnVector = new float[WaveLengths.Count];
+            for (int i = 0; i < returnVector.Length; i++)
             {
                 returnVector[i] = vector[i, 0];
             }
-                
+
             return returnVector;
         }
+
+        public Microsoft.Xna.Framework.Point Point { get { return _point; } }
+        private Microsoft.Xna.Framework.Point _point;
+
+        public Stream SpectralDataPlotLocation { get { return _spectralDataPlotLocation; } }
+        private Stream _spectralDataPlotLocation;
+
+        public String FileName { get { return _fileName; } }
+        private String _fileName;
+
     }
 }
