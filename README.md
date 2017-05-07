@@ -162,7 +162,7 @@ To add spectral data to classify with, use a .asc file, examples can be found in
 
 
 # Info
-Last edit: 4/19/2017
+Last edit: 5/7/2017
 
 Made By: Zack Jorquera
 
