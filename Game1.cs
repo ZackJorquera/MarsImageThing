@@ -1,4 +1,4 @@
-﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -338,7 +338,7 @@ namespace MarsImageThing
                         {
                             if ((stream = openFileDialog2.OpenFile()) != null)
                             {
-                                spectralDataPoints.Add(new SpectralData(Microsoft.Xna.Framework.Point.Zero, stream, cameraImagesAreFrom));
+                                spectralDataPoints.Add(new SpectralData(Point.Zero, stream, cameraImagesAreFrom));
                                 findingPoint = false;
                             }
                         }
@@ -607,8 +607,8 @@ namespace MarsImageThing
                     spriteBatch.DrawString(font, spectralDataPoints[i].FileName, new Vector2(i * (graphics.PreferredBackBufferWidth / 6), 410 + ((i % 2 == 0) ? 0 : 15)), Color.Black);
                 else
                 {
-                    spriteBatch.DrawString(font, "x=" + ((colorOn - 1 == i && findingPoint) ? finding.X.ToString() : ((spectralDataPoints[i].Point != Microsoft.Xna.Framework.Point.Zero) ? spectralDataPoints[i].Point.X.ToString() : "none")), new Vector2(50 + i * (graphics.PreferredBackBufferWidth / 6), 410), Color.Black);
-                    spriteBatch.DrawString(font, "y=" + ((colorOn - 1 == i && findingPoint) ? finding.Y.ToString() : ((spectralDataPoints[i].Point != Microsoft.Xna.Framework.Point.Zero) ? spectralDataPoints[i].Point.Y.ToString() : "none")), new Vector2(50 + i * (graphics.PreferredBackBufferWidth / 6), 425), Color.Black);
+                    spriteBatch.DrawString(font, "x=" + ((colorOn - 1 == i && findingPoint) ? finding.X.ToString() : ((spectralDataPoints[i].Point != Point.Zero) ? spectralDataPoints[i].Point.X.ToString() : "none")), new Vector2(50 + i * (graphics.PreferredBackBufferWidth / 6), 410), Color.Black);
+                    spriteBatch.DrawString(font, "y=" + ((colorOn - 1 == i && findingPoint) ? finding.Y.ToString() : ((spectralDataPoints[i].Point != Point.Zero) ? spectralDataPoints[i].Point.Y.ToString() : "none")), new Vector2(50 + i * (graphics.PreferredBackBufferWidth / 6), 425), Color.Black);
 
                 }
 
@@ -623,30 +623,30 @@ namespace MarsImageThing
                 {
                     if (i < 9)
                     {
-                        spriteBatch.Draw((imagesInList[(i - 1)] == null) ? BlankImage : imagesInList[(i - 1)], new Microsoft.Xna.Framework.Rectangle(25 + (i - 1) * openStackValuePer, 25, 256, 256), Microsoft.Xna.Framework.Color.White);
+                        spriteBatch.Draw((imagesInList[(i - 1)] == null) ? BlankImage : imagesInList[(i - 1)], new Rectangle(25 + (i - 1) * openStackValuePer, 25, 256, 256), Color.White);
                     }
                     else
                     {
-                        spriteBatch.Draw((imagesInList2[(i - 9)] == null) ? BlankImage : imagesInList2[(i - 9)], new Rectangle(25 + (i - 9) * openStackValuePer, 25 + openStackValuePer * 256 / 100, 256, 256), Microsoft.Xna.Framework.Color.White);
+                        spriteBatch.Draw((imagesInList2[(i - 9)] == null) ? BlankImage : imagesInList2[(i - 9)], new Rectangle(25 + (i - 9) * openStackValuePer, 25 + openStackValuePer * 256 / 100, 256, 256), Color.White);
                     }
                 }
             }
             if (hoveringOver != 0)
             {
                 if (hoveringOver < 9)
-                    spriteBatch.Draw((imagesInList[(((hoveringOver == 0) ? 1 : hoveringOver) - 1)] == null) ? BlankImage : imagesInList[(((hoveringOver == 0) ? 1 : hoveringOver) - 1)], new Microsoft.Xna.Framework.Rectangle(25 + (((hoveringOver == 0) ? 1 : hoveringOver) - 1) * openStackValuePer - 10, 25 - 10, 256 + 20, 256 + 20), Microsoft.Xna.Framework.Color.White);
+                    spriteBatch.Draw((imagesInList[(((hoveringOver == 0) ? 1 : hoveringOver) - 1)] == null) ? BlankImage : imagesInList[(((hoveringOver == 0) ? 1 : hoveringOver) - 1)], new Rectangle(25 + (((hoveringOver == 0) ? 1 : hoveringOver) - 1) * openStackValuePer - 10, 25 - 10, 256 + 20, 256 + 20), Microsoft.Xna.Framework.Color.White);
                 else
-                    spriteBatch.Draw((imagesInList2[hoveringOver - 9] == null) ? BlankImage : imagesInList2[hoveringOver - 9], new Microsoft.Xna.Framework.Rectangle(25 + (hoveringOver - 9) * openStackValuePer - 10, 25 - 10 + 256, 256 + 20, 256 + 20), Microsoft.Xna.Framework.Color.White);
+                    spriteBatch.Draw((imagesInList2[hoveringOver - 9] == null) ? BlankImage : imagesInList2[hoveringOver - 9], new Rectangle(25 + (hoveringOver - 9) * openStackValuePer - 10, 25 - 10 + 256, 256 + 20, 256 + 20), Color.White);
                 spriteBatch.DrawString(font, ((hoveringOver < 9) ? ((cameraImagesAreFrom == 1)? "R" : "L") : "R") + (hoveringOver - ((hoveringOver < 9) ? 0 : 8)), new Vector2(25 + (((hoveringOver == 0) ? 1 : ((hoveringOver < 9) ? hoveringOver : hoveringOver - 8)) - 1) * openStackValuePer - 10 + 50, ((hoveringOver < 9) ? 0 : 256)), Color.Black);
             }
 
             for (int i = 0; i < spectralDataPoints.Count + ((findingPoint) ? 1 : 0) && i < colorOn; i++)//DRAWS points on image
             {
-                if (spectralDataPoints.Count > i && spectralDataPoints[i].Point != Microsoft.Xna.Framework.Point.Zero && hoveringOver == 0 && openStackValuePer <= 0)
+                if (spectralDataPoints.Count > i && spectralDataPoints[i].Point != Point.Zero && hoveringOver == 0 && openStackValuePer <= 0)
                     spriteBatch.Draw(whiteDot, new Rectangle((spectralDataPoints[i].Point.X * 256 / ImageSize.X) + 25 - 5, (spectralDataPoints[i].Point.Y * 256 / ImageSize.Y) + 25 - 5, 10, 10), colors[i]);
             }
 
-            spriteBatch.DrawString(font, "(" + x + "," + y + ")", new Vector2(0, 465), Microsoft.Xna.Framework.Color.Black);
+            spriteBatch.DrawString(font, "(" + x + "," + y + ")", new Vector2(0, 465), Color.Black);
 
             spriteBatch.End();
 
