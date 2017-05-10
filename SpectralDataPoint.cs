@@ -19,8 +19,8 @@ namespace MarsImageThing
     class SpectralData
     {
         int _cameraImagesAreFrom;
-        int[] SpectralWaveLengthForEachFilterLeft = { 739, 753, 673, 601, 535, 482, 432, 440 }; //filter waveleanght for filters L12345678
-        int[] SpectralWaveLengthForEachFilterRight = { 436, 754, 803, 864, 904, 934, 1009, 880 };//filter waveleanght for filters R12345678
+        int[] SpectralWaveLengthForEachFilterLeft = new int[8];// = { 739, 753, 673, 601, 535, 482, 432, 440 }; //filter wavelenght for filters L12345678
+        int[] SpectralWaveLengthForEachFilterRight = new int[8];// = { 436, 754, 803, 864, 904, 934, 1009, 880 };//filter wavelenght for filters R12345678
         //red green blue filters are L2 L5 L7 or L3 L5 L6
 
 
@@ -36,6 +36,50 @@ namespace MarsImageThing
         }
         public float[] GetReflectanceVectorFromPlotFile()
         {
+            string TempFile = Path.GetTempPath() + "SpectralData.CHSMars";
+
+            using (StreamReader SRT = new StreamReader(TempFile))
+            {
+                char[] SpectralWaveLengthForEachFilter = SRT.ReadToEnd().ToCharArray();
+                bool collectingForRight = false;
+                bool collectingData = false;
+                string thisString = "";
+                int filterOn = 0;
+
+                for(int i = 0; i < TempFile.Length; i ++)
+                {
+                    if (SpectralWaveLengthForEachFilter[i] == '\n')
+                    {
+                        collectingForRight = true;
+                        collectingData = false;
+                        filterOn = 0;
+                    }
+
+                    if (collectingData && SpectralWaveLengthForEachFilter[i] != '^')
+                        thisString += SpectralWaveLengthForEachFilter[i];
+
+                    if (SpectralWaveLengthForEachFilter[i] == '^')
+                    {
+                        if (collectingData)
+                        {
+                            if (collectingForRight)
+                                SpectralWaveLengthForEachFilterRight[filterOn] = (int)float.Parse(thisString);
+                            else
+                                SpectralWaveLengthForEachFilterLeft[filterOn] = (int)float.Parse(thisString);
+                            thisString = null;
+                            filterOn++;
+                        }
+                        else
+                        {
+                            collectingData = true;
+                            
+                        }
+                    }
+                }
+                SRT.Close();
+            }
+
+
             List<int> WaveLengths = new List<int>();
             if (_cameraImagesAreFrom == -1)//gets the used data wavelenghts to get reflectance data from
                 WaveLengths = SpectralWaveLengthForEachFilterLeft.ToList();

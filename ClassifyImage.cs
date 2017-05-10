@@ -46,6 +46,7 @@ namespace MarsImageThing
                             if (ImageLocations[i] != null)//only exepts images with the same size as the first
                             {
                                 Bitmap tempImage = new Bitmap(ImageLocations[i]);
+                                
                                 if (_imageSize == (new System.Drawing.Point(0, 0)))
                                     _imageSize = new System.Drawing.Point(tempImage.Width, tempImage.Height);
                                 if (tempImage.Size.Height == _imageSize.Y && tempImage.Size.Width == _imageSize.X)
@@ -112,8 +113,8 @@ namespace MarsImageThing
                             {
                                 for (int y = CP.Range.Y; y < CP.Range.Y + CP.Range.Height; y++)
                                 {
-                                    if (CP.Pixles[x, y] != System.Drawing.Color.Black)
-                                        outputImage.SetPixel(x, y, CP.Pixles[x, y]);
+                                    if (CP.Pixles.GetPixel(x, y) != System.Drawing.Color.Black)
+                                        outputImage.SetPixel(x, y, CP.Pixles.GetPixel(x, y));
                                 }
                             }
                         }
@@ -188,7 +189,7 @@ namespace MarsImageThing
                             {
                                 for (int y = 0; y < _imageSize.Y; y++)
                                 {
-                                    outputImage.SetPixel(x, y, System.Drawing.Color.FromArgb(255, imageList[2].GetPixel(x, y).R, imageList[4].GetPixel(x, y).G, imageList[5].GetPixel(x, y).B));
+                                    outputImage.SetPixel(x, y, System.Drawing.Color.FromArgb(255, redImage.GetPixel(x, y).R, greenImage.GetPixel(x, y).G, blueImage.GetPixel(x, y).B));
                                 }
                             }
 
@@ -228,7 +229,7 @@ namespace MarsImageThing
             _spectralDataPoints = spectralDataPoints;
             _spectralDataVector = spectralDataVector;
             _range = range;
-            _pixles = new System.Drawing.Color[_imageSize.X, _imageSize.Y];
+            _pixles = new Bitmap(_imageSize.X, _imageSize.Y);
             _doneEvent = doneEvent;
 
         }
@@ -242,7 +243,7 @@ namespace MarsImageThing
             {
                 for (int y = _range.Y; y < _range.Y + _range.Height; y++)
                 {
-                    _pixles[x, y] = FindPixleColor(new System.Drawing.Point(x, y));
+                    _pixles.SetPixel(x, y, FindPixleColor(new System.Drawing.Point(x, y)));
                 }
             }
             Console.WriteLine("thread {0} result calculated...", threadIndex);
@@ -306,8 +307,8 @@ namespace MarsImageThing
         public System.Drawing.Rectangle Range { get { return _range; } }
         private System.Drawing.Rectangle _range;
 
-        public System.Drawing.Color[,] Pixles { get { return _pixles; } }
-        private System.Drawing.Color[,] _pixles;
+        public Bitmap Pixles { get { return _pixles; } }
+        private Bitmap _pixles;
 
         private ManualResetEvent _doneEvent;
     }

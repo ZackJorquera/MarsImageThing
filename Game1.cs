@@ -1,4 +1,4 @@
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
@@ -66,6 +66,8 @@ namespace MarsImageThing
         string x;
         string y;
 
+        string SpectralDataLensFiltersFile = null;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -80,6 +82,19 @@ namespace MarsImageThing
 
             graphics.PreferredBackBufferWidth = 1006;//855
             graphics.ApplyChanges();
+
+
+            SpectralDataLensFiltersFile = Path.GetTempPath() + "SpectralData.CHSMars";
+
+            if (!File.Exists(SpectralDataLensFiltersFile))
+            {
+                using (StreamWriter SWT = new StreamWriter(SpectralDataLensFiltersFile))
+                {
+                    SWT.WriteLine("^739^753^673^601^535^482^432^440^");
+                    SWT.WriteLine("^436^754^803^864^904^934^1009^880^");
+                    SWT.Close();
+                }
+            }
 
             base.Initialize();
 
@@ -346,7 +361,7 @@ namespace MarsImageThing
                     catch (IOException ex)
                     {
                         OutputText = "File input error: " + ex.Message;
-                        OutputText = new string(OutputText.Select((j, i) => i > 0 && i % 60 == 0 ? new[] { '\n', j } : new[] { j }).SelectMany(j => j).ToArray());//??
+                        OutputText = new string(OutputText.Select((j, i) => i > 0 && i % 60 == 0 ? new[] { '\n', j } : new[] { j }).SelectMany(j => j).ToArray());
                         ErrorTimeOut = 1000;
                     }
                 }
