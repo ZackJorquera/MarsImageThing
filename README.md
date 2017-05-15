@@ -1,6 +1,15 @@
 # MarsImageClassifier
 This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
+# Capabilitys
+This program is able to classify diffrent parts of on image given a point in the image, meaning if there is are objects in th eimage the program is able to find other thing that are more closely a like then other objetcs. Most of that a human can already do  pretty easly. Adding on to this, using spectral data with the reflectance at certan wavelengths allowes for easer classification when figering out unknowen types of objects. An example of this in action is:
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow,there is magnetite in rocks on mars!!! The more you know.")
+The first point is set to the dirt and dust around the rocks and the second point is set to the spectral data file for magnetite, MarsImageThing/SpectralData/magnetite_hs78.13233.asc, which is commonly found in the rocks on mars.
+
+The second thing that can be done is the ability to create a colored image to help understande what is in the image.
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/Screenshot%202017-05-15%20at%209.39.29%20AM.png "oooww Color, so pretty")
+In order for this to be done diffrent filters must be used to get the reflectance at any point
+
 # Code
 This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios.
 All code for the UI can be found in: MarsImageThing/Game1.cs
@@ -148,11 +157,6 @@ public void ThreadPoolCallback(Object threadContext)
 }
 ```
 The threadIndex variable is just for debug purposes, it is not used for any computational purposes.
-
-### Output
-Something like: 
-![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow,there is magnetite in rocks on mars!!! The more you know.")
-The first point is set to the dirt and dust around the rocks and the second point is set to the spectral data file for magnetite, MarsImageThing/SpectralData/magnetite_hs78.13233.asc, which is commonly found in the rocks on mars.
 
 # Usage
 The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
