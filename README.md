@@ -1,14 +1,14 @@
 # MarsImageClassifier
 This program was made for the martian club(link coming soon) that was started at my school, [Centaurus High School](http://ceh.bvsd.org/Pages/default.aspx).
 
-# Capabilitys
-This program is able to classify diffrent parts of on image given a point in the image, meaning if there is are objects in th eimage the program is able to find other thing that are more closely a like then other objetcs. Most of that a human can already do  pretty easly. Adding on to this, using spectral data with the reflectance at certan wavelengths allowes for easer classification when figering out unknowen types of objects. An example of this in action is:
-![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow,there is magnetite in rocks on mars!!! The more you know.")
+# Capabilities
+This program is able to classify different parts of on image is given a point in the image, meaning if there is are objects in the image the program is able to find another thing that is more closely alike than other objects. Most of that a human can already do pretty easily. Adding on to this, using spectral data with the reflectance at certain wavelengths allows for easier classification when figuring out unknown types of objects. An example of this in action is:
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/OutPut.png "Wow, there is magnetite in rocks on mars!!! The more you know.")
 The first point is set to the dirt and dust around the rocks and the second point is set to the spectral data file for magnetite, MarsImageThing/SpectralData/magnetite_hs78.13233.asc, which is commonly found in the rocks on mars.
 
-The second thing that can be done is the ability to create a colored image to help understande what is in the image.
-![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/Screenshot%202017-05-15%20at%209.39.29%20AM.png "oooww Color, so pretty")
-In order for this to be done diffrent filters must be used to get the reflectance at any point
+The second thing that can be done is the ability to create a colored image to help understand what is in the image.
+![alt text](https://raw.githubusercontent.com/ZackJorquera/MarsImageThing/master/README.md%20Images/Screenshot%202017-05-15%20at%209.39.29%20AM.png "oww Color, so pretty")
+In order for this to be done different filters must be used to get the reflectance at any point
 
 # Code
 This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios.
@@ -17,7 +17,7 @@ The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs a
 
 ## How The Code Works to Classify The Images
 ### Key Concepts
-In everyday life everything absorbs and reflects light; This in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 700nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR wavelengths are used as filters for the cameras.
+In everyday life everything absorbs and reflects light; This, in turn, gives it its color. While we humans can only see the visible spectrum (400nm - 700nm) there are still more wavelengths that are also affected by objects in the same way. Although for opportunity only near-UV to near-IR wavelengths are used as filters for the cameras.
 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
@@ -158,6 +158,10 @@ public void ThreadPoolCallback(Object threadContext)
 ```
 The threadIndex variable is just for debug purposes, it is not used for any computational purposes.
 
+### Part 6: Colored Image
+To create a colored image different filters can be used to represent red green and blue. The easiest filters to use are L2 L5 L7 or L3 L5 L6 as red green blue respectively. IN actuality this is not the case because the filters do not match the red green and blue wavelengths, so to make the colored image different images would have to be taken into account with different ratios. Here is an image of the wavelengths for red green and blue images:
+![alt text](http://www.mathpages.com/home/kmath578/kmath578_files/image006.gif, "colorful`)
+
 # Usage
 The application file can be ran from: MarsImageThing/Release/MarsImageThing.exe
 The images must be in .jpg format and the example images can be found in: MarsImageThing/MartianProjectImages/  
@@ -170,4 +174,4 @@ Last edit: 5/7/2017
 
 Made By: Zack Jorquera
 
-Thanks to Samuel Estrella for the original concept for the classification allgorithm.
+Thanks to Samuel Estrella for the original concept for the classification algorithm.
