@@ -11,9 +11,9 @@ The second thing that can be done is the ability to create a colored image to he
 In order for this to be done different filters must be used to get the reflectance at any point
 
 # Code
-This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios.
-All code for the UI can be found in: MarsImageThing/Game1.cs
-The classification algorithum can be found in: MarsImageThing/ClassifyImage.cs and MarsImageThing/SpectralDataPoint.cs
+This code is made in c# using the [MonoGame XNA Framework](http://www.monogame.net/) with Visual Studios. 
+All code for the UI can be found in MarsImageThing/Game1.cs
+The classification algorithm can be found in: MarsImageThing/ClassifyImage.cs and MarsImageThing/SpectralDataPoint.cs
 
 ## How The Code Works to Classify The Images
 ### Key Concepts
@@ -22,7 +22,7 @@ In everyday life everything absorbs and reflects light; This, in turn, gives it 
 ![alt text](https://imagine.gsfc.nasa.gov/Images/science/EM_spectrum_compare_level1_lg.jpg "Electromagnetic Spectrum")
 
 ### Part 1: Files
-In windows, opening a file using their built in using System.Windows.Forms.OpenFileDiolog can be done like this:
+In windows, opening a file using its built in using System.Windows.Forms.OpenFileDiolog can be done like this:
 ```c#
 OpenFileDialog openFileDialog = new OpenFileDialog();
 openFileDialog.Filter = "Image File (*.jpg)|*.jpg|All files (*.*)|*.*";
@@ -38,7 +38,7 @@ if (openFileDialog.ShowDialog() == DialogResult.OK)
     }
 }
 ```
-In this example the file is never used, but the file location is saved to the variable stream when ```stream = openFileDialog.OpenFile()``` was used. Also for Part 4 this same methed can be used to save the file, use System.Windows.Forms.SaveFileDiolog.
+In this example, the file is never used, but the file location is saved to the variable ```stream``` when the ```openFileDialog.OpenFile()``` method used. Also for Part 4, this method can be used to save the file, use System.Windows.Forms.SaveFileDiolog.
 
 ### Part 2: Declaring Variables
 Here, the file paths are converted in to a System.Drawing.BitMap where each pixel can be used independently:
